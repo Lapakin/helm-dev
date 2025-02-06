@@ -1,6 +1,6 @@
 .PHONY: index-repo
 index-repo:
-	helm repo index docs/ --url https://kre-college.github.io/helm/docs
+	helm repo index docs/ --url https://lapakin.github.io/helm-dev/docs
 	mv docs/index.yaml .
 
 .PHONY:package-all

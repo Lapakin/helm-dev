@@ -14,6 +14,9 @@ spec:
       labels:
         app: minio
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: minio
           image: {{ .Values.deployment.container.image.repository }}:{{ .Values.deployment.container.image.tag }}
@@ -32,14 +35,25 @@ spec:
             limits:
               cpu: {{ .Values.deployment.resources.limits.cpu }}
               memory: {{ .Values.deployment.resources.limits.memory }}
-          {{ if .Values.minioPVC }}
           volumeMounts:
+          {{ if .Values.minioPVC }}
             - name: minio-storage
               mountPath: /data
           {{ end }}
-      {{ if .Values.minioPVC }}
+          {{ if .Values.hostPath }}
+            - name: local-volume
+              mountPath: /data
+          {{ end }}
       volumes:
+        {{ if .Values.minioPVC }}
         - name: minio-storage
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-pvc
-      {{ end }}
+        {{ end }}
+        {{ if .Values.hostPath }}
+        - name: local-volume
+          hostPath:
+            path: {{ .Values.hostPath.path }}
+            type: Directory
+        {{ end }}
+
